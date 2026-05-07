@@ -2,6 +2,12 @@ const videoElement = document.getElementById("video");
 const canvasElement = document.getElementById("canvas");
 const canvasCtx = canvasElement.getContext("2d");
 
+const portalVideo = document.createElement("video");
+portalVideo.src = "video.mp4";
+portalVideo.loop = true;
+portalVideo.muted = true;
+portalVideo.play();
+
 async function startCamera() {
   const stream = await navigator.mediaDevices.getUserMedia({
     video: true,
@@ -48,13 +54,11 @@ function onResults(results) {
     return;
   }
 
-  const handsLM = results.multiHandLandmarks;
+  const h1 = results.multiHandLandmarks[0];
+  const h2 = results.multiHandLandmarks[1];
 
-  const h1 = handsLM[0];
-  const h2 = handsLM[1];
-
-  const p1 = h1[8]; 
-  const p2 = h1[4]; 
+  const p1 = h1[8];
+  const p2 = h1[4];
   const p3 = h2[8];
   const p4 = h2[4];
 
@@ -75,10 +79,11 @@ function onResults(results) {
   canvasCtx.lineTo(x4, y4);
   canvasCtx.lineTo(x3, y3);
   canvasCtx.closePath();
+
   canvasCtx.clip();
 
   canvasCtx.drawImage(
-    videoElement,
+    portalVideo,
     0,
     0,
     canvasElement.width,
@@ -87,7 +92,7 @@ function onResults(results) {
 
   canvasCtx.restore();
 
-  for (const lm of handsLM) {
+  for (const lm of results.multiHandLandmarks) {
     drawConnectors(canvasCtx, lm, HAND_CONNECTIONS);
     drawLandmarks(canvasCtx, lm);
   }
