@@ -13,35 +13,25 @@ video, canvas {
   object-fit: cover;
 }
 
-.video-toggle {
+.controls {
   position: absolute;
   z-index: 1;
   top: 16px;
   right: 16px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border: 1px solid rgb(255 255 255 / 35%);
-  border-radius: 999px;
-  background: rgb(0 0 0 / 65%);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
   color: white;
   font: 14px sans-serif;
-  cursor: pointer;
-  user-select: none;
 }
 
-.tracking-status {
-  position: absolute;
-  z-index: 1;
-  top: 16px;
-  left: 16px;
-  padding: 10px 14px;
-  border: 1px solid rgb(255 255 255 / 35%);
-  border-radius: 999px;
-  background: rgb(0 0 0 / 65%);
-  color: white;
-  font: 14px sans-serif;
+.video-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .video-toggle input {
