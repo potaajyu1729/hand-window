@@ -1,12 +1,28 @@
 const videoElement = document.getElementById("video");
 const canvasElement = document.getElementById("canvas");
 const canvasCtx = canvasElement.getContext("2d");
+const videoModeToggle = document.getElementById("video-mode");
 
 const portalVideo = document.createElement("video");
 portalVideo.src = "video.mp4";
 portalVideo.loop = true;
 portalVideo.muted = true;
-portalVideo.play();
+
+function setVideoMode(enabled) {
+  if (enabled) {
+    portalVideo.play().catch(error => {
+      videoModeToggle.checked = false;
+      console.error("動画演出を再生できませんでした。", error);
+    });
+  } else {
+    portalVideo.pause();
+  }
+}
+
+videoModeToggle.addEventListener("change", () => {
+  setVideoMode(videoModeToggle.checked);
+});
+setVideoMode(videoModeToggle.checked);
 
 async function startCamera() {
   const stream = await navigator.mediaDevices.getUserMedia({
@@ -50,49 +66,45 @@ function onResults(results) {
     canvasElement.height
   );
 
-  if (!results.multiHandLandmarks || results.multiHandLandmarks.length < 2) {
-    return;
+  const landmarks = results.multiHandLandmarks || [];
+
+  if (videoModeToggle.checked && landmarks.length > 0) {
+    let windowPoints;
+
+    if (landmarks.length >= 2) {
+      const firstHand = landmarks[0];
+      const secondHand = landmarks[1];
+      windowPoints = [firstHand[8], firstHand[4], secondHand[4], secondHand[8]];
+    } else {
+      const hand = landmarks[0];
+      windowPoints = [hand[8], hand[5], hand[17], hand[4]];
+    }
+
+    canvasCtx.save();
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(
+      windowPoints[0].x * canvasElement.width,
+      windowPoints[0].y * canvasElement.height
+    );
+    for (const point of windowPoints.slice(1)) {
+      canvasCtx.lineTo(
+        point.x * canvasElement.width,
+        point.y * canvasElement.height
+      );
+    }
+    canvasCtx.closePath();
+    canvasCtx.clip();
+    canvasCtx.drawImage(
+      portalVideo,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
+    );
+    canvasCtx.restore();
   }
 
-  const h1 = results.multiHandLandmarks[0];
-  const h2 = results.multiHandLandmarks[1];
-
-  const p1 = h1[8];
-  const p2 = h1[4];
-  const p3 = h2[8];
-  const p4 = h2[4];
-
-  const x1 = p1.x * canvasElement.width;
-  const y1 = p1.y * canvasElement.height;
-  const x2 = p2.x * canvasElement.width;
-  const y2 = p2.y * canvasElement.height;
-  const x3 = p3.x * canvasElement.width;
-  const y3 = p3.y * canvasElement.height;
-  const x4 = p4.x * canvasElement.width;
-  const y4 = p4.y * canvasElement.height;
-
-  canvasCtx.save();
-
-  canvasCtx.beginPath();
-  canvasCtx.moveTo(x1, y1);
-  canvasCtx.lineTo(x2, y2);
-  canvasCtx.lineTo(x4, y4);
-  canvasCtx.lineTo(x3, y3);
-  canvasCtx.closePath();
-
-  canvasCtx.clip();
-
-  canvasCtx.drawImage(
-    portalVideo,
-    0,
-    0,
-    canvasElement.width,
-    canvasElement.height
-  );
-
-  canvasCtx.restore();
-
-  for (const lm of results.multiHandLandmarks) {
+  for (const lm of landmarks) {
     drawConnectors(canvasCtx, lm, HAND_CONNECTIONS);
     drawLandmarks(canvasCtx, lm);
   }
