@@ -9,9 +9,12 @@ portalVideo.loop = true;
 portalVideo.muted = true;
 
 function setVideoMode(enabled) {
+  videoModeToggle.textContent = `動画演出: ${enabled ? "ON" : "OFF"}`;
+  videoModeToggle.setAttribute("aria-pressed", String(enabled));
+
   if (enabled) {
     portalVideo.play().catch(error => {
-      videoModeToggle.checked = false;
+      setVideoMode(false);
       console.error("動画演出を再生できませんでした。", error);
     });
   } else {
@@ -19,10 +22,10 @@ function setVideoMode(enabled) {
   }
 }
 
-videoModeToggle.addEventListener("change", () => {
-  setVideoMode(videoModeToggle.checked);
+videoModeToggle.addEventListener("click", () => {
+  setVideoMode(videoModeToggle.getAttribute("aria-pressed") !== "true");
 });
-setVideoMode(videoModeToggle.checked);
+setVideoMode(true);
 
 async function startCamera() {
   const stream = await navigator.mediaDevices.getUserMedia({
@@ -68,7 +71,7 @@ function onResults(results) {
 
   const landmarks = results.multiHandLandmarks || [];
 
-  if (videoModeToggle.checked && landmarks.length > 0) {
+  if (videoModeToggle.getAttribute("aria-pressed") === "true" && landmarks.length > 0) {
     const firstHand = landmarks[0];
     const secondHand = landmarks[1];
     const windowPoints = secondHand

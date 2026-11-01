@@ -27,14 +27,16 @@ video, canvas {
 }
 
 .video-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
   user-select: none;
 }
 
-.video-toggle input {
-  margin: 0;
-  accent-color: #54d6ff;
+.video-toggle:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
 }
