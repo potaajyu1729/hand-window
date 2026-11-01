@@ -2,8 +2,6 @@ const videoElement = document.getElementById("video");
 const canvasElement = document.getElementById("canvas");
 const canvasCtx = canvasElement.getContext("2d");
 const videoModeToggle = document.getElementById("video-mode");
-const trackingStatus = document.getElementById("tracking-status");
-const handColors = ["#00e5ff", "#ff4d6d", "#a8ff3e", "#ffd43b"];
 
 const portalVideo = document.createElement("video");
 portalVideo.src = "video.mp4";
@@ -49,7 +47,7 @@ const hands = new Hands({
 });
 
 hands.setOptions({
-  maxNumHands: 4,
+  maxNumHands: 2,
   modelComplexity: 1,
   minDetectionConfidence: 0.7,
   minTrackingConfidence: 0.7
@@ -69,59 +67,41 @@ function onResults(results) {
   );
 
   const landmarks = results.multiHandLandmarks || [];
-  trackingStatus.textContent = `検出した手: ${landmarks.length} / 4`;
 
   if (videoModeToggle.checked && landmarks.length > 0) {
-    for (let i = 0; i < landmarks.length; i += 2) {
-      const firstHand = landmarks[i];
-      const secondHand = landmarks[i + 1];
-      const windowPoints = secondHand
-        ? [firstHand[8], firstHand[4], secondHand[4], secondHand[8]]
-        : [firstHand[8], firstHand[5], firstHand[17], firstHand[4]];
+    const firstHand = landmarks[0];
+    const secondHand = landmarks[1];
+    const windowPoints = secondHand
+      ? [firstHand[8], firstHand[4], secondHand[4], secondHand[8]]
+      : [firstHand[8], firstHand[5], firstHand[17], firstHand[4]];
 
-      canvasCtx.save();
-      canvasCtx.beginPath();
-      canvasCtx.moveTo(
-        windowPoints[0].x * canvasElement.width,
-        windowPoints[0].y * canvasElement.height
+    canvasCtx.save();
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(
+      windowPoints[0].x * canvasElement.width,
+      windowPoints[0].y * canvasElement.height
+    );
+    for (const point of windowPoints.slice(1)) {
+      canvasCtx.lineTo(
+        point.x * canvasElement.width,
+        point.y * canvasElement.height
       );
-      for (const point of windowPoints.slice(1)) {
-        canvasCtx.lineTo(
-          point.x * canvasElement.width,
-          point.y * canvasElement.height
-        );
-      }
-      canvasCtx.closePath();
-      canvasCtx.clip();
-      canvasCtx.drawImage(
-        portalVideo,
-        0,
-        0,
-        canvasElement.width,
-        canvasElement.height
-      );
-      canvasCtx.restore();
     }
+    canvasCtx.closePath();
+    canvasCtx.clip();
+    canvasCtx.drawImage(
+      portalVideo,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
+    );
+    canvasCtx.restore();
   }
 
-  for (const [index, lm] of landmarks.entries()) {
-    const color = handColors[index % handColors.length];
-    drawConnectors(canvasCtx, lm, HAND_CONNECTIONS, { color, lineWidth: 3 });
-    drawLandmarks(canvasCtx, lm, {
-      color,
-      fillColor: color,
-      lineWidth: 1,
-      radius: 4
-    });
-
-    const wrist = lm[0];
-    canvasCtx.fillStyle = color;
-    canvasCtx.font = "bold 20px sans-serif";
-    canvasCtx.fillText(
-      `${index + 1}`,
-      wrist.x * canvasElement.width + 8,
-      wrist.y * canvasElement.height - 8
-    );
+  for (const lm of landmarks) {
+    drawConnectors(canvasCtx, lm, HAND_CONNECTIONS);
+    drawLandmarks(canvasCtx, lm);
   }
 }
 
