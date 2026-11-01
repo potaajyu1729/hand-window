@@ -4,23 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>hand-window</title>
-  <link rel="stylesheet" href="style.css?v=20261101-1202"/>
+  <link rel="stylesheet" href="style.css?v=20261101-1206"/>
 </head>
 <body>
 
 <video id="video" autoplay playsinline></video>
 <canvas id="canvas"></canvas>
-<div class="controls">
+<div id="ui-controls" class="controls">
   <output id="tracking-status">2つまで反応可</output>
   <button id="video-mode" class="video-toggle" type="button" aria-pressed="true">
     動画演出: ON
   </button>
 </div>
+<button id="ui-visibility" class="ui-visibility" type="button" aria-pressed="true" aria-label="操作UIを隠す">
+  UI
+</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
 
-<script src="main.js?v=20261101-1202"></script>
+<script src="main.js?v=20261101-1206"></script>
 </body>
 </html>

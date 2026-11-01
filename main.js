@@ -2,6 +2,8 @@ const videoElement = document.getElementById("video");
 const canvasElement = document.getElementById("canvas");
 const canvasCtx = canvasElement.getContext("2d");
 const videoModeToggle = document.getElementById("video-mode");
+const uiControls = document.getElementById("ui-controls");
+const uiVisibilityToggle = document.getElementById("ui-visibility");
 
 const portalVideo = document.createElement("video");
 portalVideo.src = "video.mp4";
@@ -26,6 +28,16 @@ videoModeToggle.addEventListener("click", () => {
   setVideoMode(videoModeToggle.getAttribute("aria-pressed") !== "true");
 });
 setVideoMode(true);
+
+uiVisibilityToggle.addEventListener("click", () => {
+  const isVisible = uiVisibilityToggle.getAttribute("aria-pressed") === "true";
+  uiControls.hidden = isVisible;
+  uiVisibilityToggle.setAttribute("aria-pressed", String(!isVisible));
+  uiVisibilityToggle.setAttribute(
+    "aria-label",
+    isVisible ? "操作UIを表示する" : "操作UIを隠す"
+  );
+});
 
 async function startCamera() {
   const stream = await navigator.mediaDevices.getUserMedia({

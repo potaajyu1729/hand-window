@@ -13,22 +13,35 @@ video, canvas {
   object-fit: cover;
 }
 
-.controls {
+#ui-controls {
   position: absolute;
   z-index: 1;
   top: 16px;
+  left: auto;
   right: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
   color: white;
   font: 14px sans-serif;
 }
 
+#ui-controls[hidden] {
+  display: none;
+}
+
 .video-toggle {
+  appearance: none;
   padding: 0;
   border: 0;
+  border-radius: 0;
   background: none;
   color: inherit;
   font: inherit;
@@ -39,4 +52,18 @@ video, canvas {
 .video-toggle:focus-visible {
   outline: 1px solid currentColor;
   outline-offset: 3px;
+}
+
+.ui-visibility {
+  position: absolute;
+  z-index: 1;
+  right: 12px;
+  bottom: 12px;
+  padding: 2px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: rgb(255 255 255 / 55%);
+  font: 11px sans-serif;
+  cursor: pointer;
 }
