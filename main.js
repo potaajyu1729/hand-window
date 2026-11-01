@@ -47,7 +47,7 @@ const hands = new Hands({
 });
 
 hands.setOptions({
-  maxNumHands: 2,
+  maxNumHands: 4,
   modelComplexity: 1,
   minDetectionConfidence: 0.7,
   minTrackingConfidence: 0.7
@@ -69,39 +69,36 @@ function onResults(results) {
   const landmarks = results.multiHandLandmarks || [];
 
   if (videoModeToggle.checked && landmarks.length > 0) {
-    let windowPoints;
+    for (let i = 0; i < landmarks.length; i += 2) {
+      const firstHand = landmarks[i];
+      const secondHand = landmarks[i + 1];
+      const windowPoints = secondHand
+        ? [firstHand[8], firstHand[4], secondHand[4], secondHand[8]]
+        : [firstHand[8], firstHand[5], firstHand[17], firstHand[4]];
 
-    if (landmarks.length >= 2) {
-      const firstHand = landmarks[0];
-      const secondHand = landmarks[1];
-      windowPoints = [firstHand[8], firstHand[4], secondHand[4], secondHand[8]];
-    } else {
-      const hand = landmarks[0];
-      windowPoints = [hand[8], hand[5], hand[17], hand[4]];
-    }
-
-    canvasCtx.save();
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(
-      windowPoints[0].x * canvasElement.width,
-      windowPoints[0].y * canvasElement.height
-    );
-    for (const point of windowPoints.slice(1)) {
-      canvasCtx.lineTo(
-        point.x * canvasElement.width,
-        point.y * canvasElement.height
+      canvasCtx.save();
+      canvasCtx.beginPath();
+      canvasCtx.moveTo(
+        windowPoints[0].x * canvasElement.width,
+        windowPoints[0].y * canvasElement.height
       );
+      for (const point of windowPoints.slice(1)) {
+        canvasCtx.lineTo(
+          point.x * canvasElement.width,
+          point.y * canvasElement.height
+        );
+      }
+      canvasCtx.closePath();
+      canvasCtx.clip();
+      canvasCtx.drawImage(
+        portalVideo,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height
+      );
+      canvasCtx.restore();
     }
-    canvasCtx.closePath();
-    canvasCtx.clip();
-    canvasCtx.drawImage(
-      portalVideo,
-      0,
-      0,
-      canvasElement.width,
-      canvasElement.height
-    );
-    canvasCtx.restore();
   }
 
   for (const lm of landmarks) {
